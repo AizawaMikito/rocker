@@ -1,0 +1,278 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font-sans); }
+.container { padding: 1.5rem 1rem; max-width: 720px; }
+h2 { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 1.5rem; }
+h3 { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 0.75rem; letter-spacing: 0.02em; }
+.section { margin-bottom: 1.5rem; }
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.field { flex: 1; min-width: 140px; }
+.field label { display: block; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 6px; }
+.field input { width: 100%; padding: 8px 10px; font-size: 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); }
+.field input:focus { outline: none; border-color: #378ADD; }
+.field select { width: 100%; padding: 8px 10px; font-size: 14px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); }
+
+.type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.type-card { border: 1.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; cursor: pointer; transition: border-color 0.15s; }
+.type-card.selected { border-color: #378ADD; background: #E6F1FB22; }
+.type-card h4 { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 4px; }
+.type-card p { font-size: 12px; color: var(--color-text-secondary); }
+.locker-visual { display: flex; gap: 3px; margin-top: 8px; }
+.col { display: flex; flex-direction: column; gap: 2px; }
+.cell-big { width: 22px; height: 16px; border-radius: 2px; background: #378ADD66; border: 1px solid #378ADD; }
+.cell-sm { width: 22px; height: 10px; border-radius: 2px; background: #B5D4F4; border: 1px solid #85B7EB; }
+
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 1rem; }
+.metric { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem 1rem; }
+.metric .label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.metric .value { font-size: 20px; font-weight: 500; color: var(--color-text-primary); }
+.metric .sub { font-size: 11px; color: var(--color-text-tertiary); }
+
+.result-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.result-table th { text-align: left; font-weight: 500; font-size: 12px; color: var(--color-text-secondary); padding: 6px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.result-table td { padding: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); }
+.result-table tr:last-child td { border-bottom: none; }
+.highlight { background: #E6F1FB33; }
+
+.badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 999px; }
+.badge-ok { background: #EAF3DE; color: #3B6D11; }
+.badge-warn { background: #FAEEDA; color: #854F0B; }
+.badge-info { background: #E6F1FB; color: #185FA5; }
+
+.divider { height: 0.5px; background: var(--color-border-tertiary); margin: 1rem 0; }
+.note { font-size: 12px; color: var(--color-text-tertiary); margin-top: 8px; }
+
+.mix-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.mix-row label { font-size: 13px; color: var(--color-text-secondary); min-width: 80px; }
+.mix-row input { width: 70px; padding: 6px 8px; font-size: 13px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-primary); color: var(--color-text-primary); }
+.mix-row span { font-size: 12px; color: var(--color-text-tertiary); }
+
+.tab-bar { display: flex; gap: 4px; margin-bottom: 1rem; }
+.tab { font-size: 13px; padding: 6px 14px; border-radius: 999px; border: 0.5px solid var(--color-border-tertiary); cursor: pointer; color: var(--color-text-secondary); background: transparent; }
+.tab.active { background: #378ADD; color: #fff; border-color: #378ADD; }
+</style>
+
+<div class="container">
+  <h2>ロッカー必要台数 算出ツール</h2>
+
+  <div class="section">
+    <h3>STEP 1 — 物件・会員情報</h3>
+    <div class="card">
+      <div class="row" style="margin-bottom:1rem;">
+        <div class="field">
+          <label>目標会員数（人）</label>
+          <input type="number" id="members" value="100" min="1" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>ロッカー利用率（%）</label>
+          <input type="number" id="usage_rate" value="80" min="1" max="100" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>大ロッカー希望比率（%）</label>
+          <input type="number" id="big_ratio" value="20" min="0" max="100" oninput="calc()">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label>余裕率（%）</label>
+          <input type="number" id="buffer" value="10" min="0" max="50" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>契約ロッカータイプ</label>
+          <select id="mode" onchange="calc()">
+            <option value="auto">自動選択（最適化）</option>
+            <option value="1col">1列8段のみ</option>
+            <option value="3col">3列8段のみ</option>
+            <option value="mix">手動ミックス</option>
+          </select>
+        </div>
+      </div>
+      <div id="mix-area" style="display:none; margin-top:1rem; padding-top:1rem; border-top:0.5px solid var(--color-border-tertiary);">
+        <h3>手動ミックス設定</h3>
+        <div class="mix-row">
+          <label>1列8段 台数</label>
+          <input type="number" id="m1col" value="0" min="0" oninput="calc()">
+          <span>台</span>
+        </div>
+        <div class="mix-row">
+          <label>3列8段 台数</label>
+          <input type="number" id="m3col" value="0" min="0" oninput="calc()">
+          <span>台</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>STEP 2 — ロッカー仕様（確認）</h3>
+    <div class="type-grid">
+      <div class="type-card">
+        <h4>1列8段</h4>
+        <p>大ロッカー×1 ／ 小ロッカー×7</p>
+        <div class="locker-visual">
+          <div class="col">
+            <div class="cell-sm"></div><div class="cell-sm"></div><div class="cell-sm"></div>
+            <div class="cell-sm"></div><div class="cell-sm"></div><div class="cell-sm"></div>
+            <div class="cell-sm"></div><div class="cell-big"></div>
+          </div>
+        </div>
+      </div>
+      <div class="type-card">
+        <h4>3列8段</h4>
+        <p>大ロッカー×3 ／ 小ロッカー×21</p>
+        <div class="locker-visual">
+          <div class="col">
+            <div class="cell-sm"></div><div class="cell-sm"></div><div class="cell-sm"></div>
+            <div class="cell-sm"></div><div class="cell-sm"></div><div class="cell-sm"></div>
+            <div class="cell-sm"></div><div class="cell-big"></div>
+          </div>
+          <div class="col">
+            <div class="cell-sm"></div><div class="cell-sm"></div><div class="cell-sm"></div>
+            <div class="cell-sm"></div><div class="cell-sm"></div><div class="cell-sm"></div>
+            <div class="cell-sm"></div><div class="cell-big"></div>
+          </div>
+          <div class="col">
+            <div class="cell-sm"></div><div class="cell-sm"></div><div class="cell-sm"></div>
+            <div class="cell-sm"></div><div class="cell-sm"></div><div class="cell-sm"></div>
+            <div class="cell-sm"></div><div class="cell-big"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>STEP 3 — 算出結果</h3>
+    <div class="card">
+      <div class="metrics" id="metrics"></div>
+      <div class="divider"></div>
+      <table class="result-table" id="result-table"></table>
+      <p class="note" id="result-note"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+function calc() {
+  const members = parseInt(document.getElementById('members').value) || 0;
+  const usageRate = parseFloat(document.getElementById('usage_rate').value) / 100 || 0;
+  const bigRatio = parseFloat(document.getElementById('big_ratio').value) / 100 || 0;
+  const buffer = parseFloat(document.getElementById('buffer').value) / 100 || 0;
+  const mode = document.getElementById('mode').value;
+
+  document.getElementById('mix-area').style.display = mode === 'mix' ? 'block' : 'none';
+
+  const needTotal = Math.ceil(members * usageRate * (1 + buffer));
+  const needBig = Math.ceil(needTotal * bigRatio);
+  const needSmall = needTotal - needBig;
+
+  let n1 = 0, n3 = 0;
+
+  if (mode === '1col') {
+    n1 = Math.ceil(needTotal / 8);
+    const extra = Math.ceil(needBig / 1);
+    if (extra > n1) n1 = extra;
+  } else if (mode === '3col') {
+    n3 = Math.ceil(needTotal / 24);
+    const extra = Math.ceil(needBig / 3);
+    if (extra > n3) n3 = extra;
+  } else if (mode === 'mix') {
+    n1 = parseInt(document.getElementById('m1col').value) || 0;
+    n3 = parseInt(document.getElementById('m3col').value) || 0;
+  } else {
+    // auto: minimize units while satisfying both big and total
+    let best = null;
+    for (let a = 0; a <= 200; a++) {
+      for (let b = 0; b <= 100; b++) {
+        const totalLockers = a * 8 + b * 24;
+        const bigLockers = a * 1 + b * 3;
+        if (totalLockers >= needTotal && bigLockers >= needBig) {
+          if (!best || (a + b) < (best.a + best.b)) {
+            best = { a, b };
+          }
+        }
+      }
+    }
+    if (best) { n1 = best.a; n3 = best.b; }
+  }
+
+  const totalBig = n1 * 1 + n3 * 3;
+  const totalSmall = n1 * 7 + n3 * 21;
+  const totalAll = n1 * 8 + n3 * 24;
+  const totalUnits = n1 + n3;
+
+  const surplusBig = totalBig - needBig;
+  const surplusSmall = totalSmall - needSmall;
+  const surplusTotal = totalAll - needTotal;
+
+  const okBig = totalBig >= needBig;
+  const okSmall = totalSmall >= needSmall;
+  const okTotal = totalAll >= needTotal;
+
+  document.getElementById('metrics').innerHTML = `
+    <div class="metric">
+      <div class="label">必要ロッカー数合計</div>
+      <div class="value">${needTotal}</div>
+      <div class="sub">（大${needBig}＋小${needSmall}）</div>
+    </div>
+    <div class="metric">
+      <div class="label">1列8段 台数</div>
+      <div class="value">${n1}</div>
+      <div class="sub">台</div>
+    </div>
+    <div class="metric">
+      <div class="label">3列8段 台数</div>
+      <div class="value">${n3}</div>
+      <div class="sub">台</div>
+    </div>
+    <div class="metric">
+      <div class="label">合計ユニット数</div>
+      <div class="value">${totalUnits}</div>
+      <div class="sub">台（窓数計 ${totalAll}）</div>
+    </div>
+  `;
+
+  document.getElementById('result-table').innerHTML = `
+    <thead>
+      <tr>
+        <th>項目</th>
+        <th>必要数</th>
+        <th>確保数</th>
+        <th>過不足</th>
+        <th>判定</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>大ロッカー</td>
+        <td>${needBig}</td>
+        <td>${totalBig}</td>
+        <td>${surplusBig >= 0 ? '+' : ''}${surplusBig}</td>
+        <td><span class="badge ${okBig ? 'badge-ok' : 'badge-warn'}">${okBig ? '充足' : '不足'}</span></td>
+      </tr>
+      <tr>
+        <td>小ロッカー</td>
+        <td>${needSmall}</td>
+        <td>${totalSmall}</td>
+        <td>${surplusSmall >= 0 ? '+' : ''}${surplusSmall}</td>
+        <td><span class="badge ${okSmall ? 'badge-ok' : 'badge-warn'}">${okSmall ? '充足' : '不足'}</span></td>
+      </tr>
+      <tr class="highlight">
+        <td><strong>合計</strong></td>
+        <td><strong>${needTotal}</strong></td>
+        <td><strong>${totalAll}</strong></td>
+        <td><strong>${surplusTotal >= 0 ? '+' : ''}${surplusTotal}</strong></td>
+        <td><span class="badge ${okTotal ? 'badge-ok' : 'badge-warn'}">${okTotal ? '充足' : '不足'}</span></td>
+      </tr>
+    </tbody>
+  `;
+
+  const fill = Math.round(needTotal / Math.max(totalAll, 1) * 100);
+  document.getElementById('result-note').textContent =
+    `充填率 ${fill}%（会員${members}名 × 利用率${Math.round(usageRate*100)}% × 余裕率+${Math.round(buffer*100)}%）`;
+}
+
+calc();
+</script>
